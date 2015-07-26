@@ -1,127 +1,48 @@
-####################################################
-# Title  : How to dev stm32 on linux with GNU tools 
-# Author : maxime leroy
-# Date   : 20152507
-####################################################
-#
-# In order to build, run and debug programs for stm32 microcontroller one must install the 
-# the following tools:
-# a tool chain
-# an on chip debugger, in system progamming
-# STM32F4 development framework 
-# 
-# The script download_dependencies.sh is in charge of downloading and installing 
-# the necessary tools and documents. 
-#
-# In order to begin stm32 developpement run downloading_depencies.sh:
-sh downloading_dependencies.sh
 
-#-------------------------
-# Repository organisation
-#-------------------------
-# Once dependencies are downloaded, reposirory organisation should look like that:
-tree -L 2
-.
-├── documents
-│   └── doc_micro
-├── download_dependencies.sh
-├── how_to_dev_stm32.txt
-├── projects_stm32f4
-│   ├── template_project_f405_pyboard
-│   └── template_project_f411_nucleo
-├── stm32_cube_f4
-│   ├── stm32cubef4.zip
-│   └── STM32Cube_FW_F4_V1.7.0
-└── tools
-    ├── gcc-arm-none-eabi-4_9-2015q2
-    ├── gcc-arm-none-eabi-4_9-2015q2-20150609-linux.tar.bz2
-    ├── openocd-0.9.0
-    └── openocd-0.9.0.tar.bz2
+###  Dev stm32 on linux with GNU tools
+This repository is tested under Ubuntu 14.04 kernel 3.13 x86_64 
 
-#---------------
-# Pre-requisite
-#---------------
-# Download and install gcc arm embedded toolchain
-wget https://launchpad.net/gcc-arm-embedded/4.9/4.9-2015-q2-update/+download/gcc-arm-none-eabi-4_9-2015q2-20150609-linux.tar.bz2
-tar xjvf ./gcc-arm-none-eabi-4_9-2015q2-20150609-linux.tar.bz2
+#### 1 - Repository content
+This repository is a collection projects for STM32 micro controllers
+--**projects_stm32f4**                                                                                          
+- template_project_f405_pyboard                                                                         
+- template_project_f411_nucleo
 
-# Download and install openocd, on chip debugger and in system programmer
-wget http://sourceforge.net/projects/openocd/files/openocd/0.9.0/openocd-0.9.0.tar.bz2/download
-mv download openocd-0.9.0.tar.bz2
-tar xjvf openocd-0.9.0.tar.bz2
-cd openocd-0.9.0
-./configure
-make 
-sudo make install
+#### 2 - Download dependencies
+In order to be able to build and debug a project, internet access is required and 
+script download_dependencies.sh must be run fisrt to retreive and install tools / STM32Cube 
+library collection and documentation:
+sh download_dependencoies.sh
 
-# Download and install STM32CubeF4 framework
-wget http://www.st.com/st-web-ui/static/active/en/st_prod_software_internet/resource/technical/software/firmware/stm32cubef4.zip
-unzip stm32cubef4.zip
-
-#------------------------
-# Permissions delegation
-#------------------------
-# Running OpenOCD with root/administrative permissions is strongly
-# discouraged for security reasons.
-# For USB devices on GNU/Linux you should use the contrib/99-openocd.rules
-# file. It probably belongs somewhere in /etc/udev/rules.d, but
-# consult your operating system documentation to be sure. Do not forget
-# to add yourself to the "plugdev" group.
-sudo cp contrib/99-openocd.rules /etc/udev/rules.d
-udevadm control --reload-rules
-udevadm trigger
-
-#-----------------------------------
-# Start developping for nucleo f411
-#-----------------------------------
-#
-# Download dependencies:
-#------------------------
-sh download_dependencies.sh
-
-# Repository organisation:
-#--------------------------
-tree -L 3 ./projects_stm32f4/template_project_f411_nucleo/
-./projects_stm32f4/template_project_f411_nucleo/
-├── debug_pgm.sh
-├── delay.c
-├── delay.h
-├── gcc_cmd_compile.sh
-├── main.c
-├── Makefile
-├── startup_stm32f411xe.s
-├── STM32F411RE_FLASH.ld
-├── stm32f4xx.h
-├── system.c
-├── usart.c
-└── usart.h
-
-# Change directory to template_project_f411_nucleo
+#### 3 - Build a project
+At the time of writing only template_project_f411_nucleo is tested
+Change directory to projects_stm32f4/template_project_f411_nucleo
+run the following command:
 cd ./projects_stm32f4/template_project_f411_nucleo
-
-# Build project
 make clean all
 
-# Connect nucleo board to your computer and run on-chip debugger openocd
+#### 4 - Run and Debug firmware
+Connect nucleo board to your computer and run on-chip debugger openocd
 make openocd
 
-# Two optionsi available here:
-#-----------------------------
-# 1 - Use gdb server to load firmware and debug
+##### 4.1 Two options available here:
+- Use gdb server to load firmware and debug by running debug_pgm.sh, please note that debug 
+script uses local file .gdbinit to run some commands. You may have to create a file .gdbinit 
+in your home directory with content "set auto-load safe-path /" to gdb to run a local .gdbinit
+echo "set auto-load safe-path /" > ~/.gdbinit
 sh debug_pgm.sh
+(gdb) b main.c:42
+(gdb) continue
 
-# 2 - Or open a telnet session with openocd and load the firmware
+- Or open a telnet session with openocd and load the firmware
 telnet localhost 4444
 > reset halt
 > flash write_image erase main.hex
 > reset run
 
-#-----------
-# Refrences:
-#-----------
+#### 5 - References:
 http://regalis.com.pl/en/arm-cortex-stm32-gnulinux/
 https://balau82.wordpress.com/2015/04/19/libopencm3-on-stm32-nucleo-board/
 http://openocd.org/
 https://github.com/Regalis/Rover5-STM32
-
 
