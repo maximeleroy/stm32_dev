@@ -1,10 +1,10 @@
 
-###  STM32 development on linux with GNU tools
+###  STM32 development under Linux with GNU tools
 This repository is tested under Ubuntu 14.04 kernel 3.13 x86_64 
 
 #### 1 - Repository content
 This repository is a collection of projects for STM32 micro controllers. <br/> 
-Two template projects are available in directory ./**projects_stm32f4**: <br/>                                                                                         
+Two template projects are available in directory **./projects_stm32f4**: <br/>                                                                                         
 - template_project_f405_pyboard                                                                         
 - template_project_f411_nucleo
 
@@ -44,11 +44,16 @@ $ tree -L 3
 
 #### 2 - Download dependencies
 In order to be able to build and debug a project, internet access is required and 
-script download_dependencies.sh must be run fisrt to retreive and install tools / STM32Cube 
-library collection and documentation:
-sh download_dependencoies.sh
+script **download_dependencies.sh** must be run fisrt to retreive and install:
+- tools (gcc /openocd)
+- STM32Cube library collection 
+- documentation 
 
-Once download operation ended repoitory structure should look like this:
+```
+> sh download_dependencies.sh
+```
+Once download operation ended repository structure should look like this:
+
 ```
 $ tree -L 2
 .
@@ -73,36 +78,48 @@ $ tree -L 2
 ```
 
 #### 3 - Build a project
-At the time of writing only template_project_f411_nucleo is tested
-Change directory to projects_stm32f4/template_project_f411_nucleo
-run the following command:
-cd ./projects_stm32f4/template_project_f411_nucleo
-make clean all
+At the time of writing only **template_project_f411_nucleo** is tested. <br/>
+Change directory to **projects_stm32f4/template_project_f411_nucleo**: 
+```
+> cd ./projects_stm32f4/template_project_f411_nucleo
+```
+And run the following command:
+
+```
+> make clean all
+```
 
 #### 4 - Run and Debug firmware
-Connect nucleo board to your computer and run on-chip debugger openocd
-make openocd
+Connect nucleo board to your computer and run on-chip debugger openocd:
 
+```
+> make openocd
+```
 ##### 4.1 Two options available here:
-- Use gdb server to load firmware and debug by running **debug_pgm.sh**, please note that debug 
+Use gdb server to load firmware and debug by running **debug_pgm.sh**, please note that debug 
 script uses local file **.gdbinit** to run some commands. You may have to create a file **.gdbinit** 
 in your home directory with content **set auto-load safe-path /** for gdb to run a local **.gdbinit** <br/>
-> **Optionally:** <br/>
-> echo "set auto-load safe-path /" > ~/.gdbinit <br/>
-<br/>
-> sh debug_pgm.sh <br/>
-> (gdb) b main.c:42 <br/>
-> (gdb) continue <br/>
 
-- Or open a telnet session with openocd and load the firmware <br/>
->telnet localhost 4444 <br/>
->\> reset halt <br/>
->\> flash write_image erase main.hex <br/>
->\> reset run <br/>
-
+**Optionally:**
+```
+> echo "set auto-load safe-path /" > ~/.gdbinit
+```
+Run debug script:
+```
+> sh debug_pgm.sh
+> (gdb) b main.c:42
+> (gdb) continue
+```
+Or open a telnet session with openocd and load the firmware:
+```
+> telnet localhost 4444
+> reset halt
+> flash write_image erase main.hex
+> reset run
+```
 #### 5 - References:
 http://regalis.com.pl/en/arm-cortex-stm32-gnulinux/ <br/>
 https://balau82.wordpress.com/2015/04/19/libopencm3-on-stm32-nucleo-board/ <br/>
 http://openocd.org/ <br/>
 https://github.com/Regalis/Rover5-STM32 <br/>
-
+<br/>
