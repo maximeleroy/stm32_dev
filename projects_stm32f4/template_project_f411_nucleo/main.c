@@ -18,6 +18,7 @@
 */
 #include <stm32f4xx.h>
 #include "delay.h"
+#include "usart.h"
 
 #define LED_PIN 5
 #define LED_ON() GPIOA->BSRR |= (1 << 5)
@@ -31,15 +32,17 @@ int main() {
 	/* Configure GPIOA pin 5 in max speed */
 	GPIOA->OSPEEDR |= (3 << (LED_PIN << 1));
 
-    /*Init delay*/
+    /* Init */
     delay_init();	
-	
-	/* Toggle LED */
+	usart_init();
 
+	/* Toggle LED */
 	for(;;) {
 		LED_ON();
+		usart_puts("LED ON (PA5)\n\r");
 		_delay_ms(1000);
 		LED_OFF();
+		usart_puts("LED OFF (PA5)\n\r");
 		_delay_ms(1000);
 	}
 
