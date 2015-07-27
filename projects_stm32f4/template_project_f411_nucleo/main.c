@@ -19,6 +19,7 @@
 #include <stm32f4xx.h>
 #include "delay.h"
 #include "usart.h"
+#include "bluetooth.h"
 
 #define LED_PIN 5
 #define LED_ON() GPIOA->BSRR |= (1 << 5)
@@ -35,15 +36,27 @@ int main() {
     /* Init */
     delay_init();	
 	usart_init();
+    bluetooth_init();
 
 	/* Toggle LED */
 	for(;;) {
-		LED_ON();
-		usart_puts("LED ON (PA5)\n\r");
-		_delay_ms(1000);
-		LED_OFF();
-		usart_puts("LED OFF (PA5)\n\r");
-		_delay_ms(1000);
+		char command = bluetooth_getc_timeout(1000);
+
+		if (bluetooth_check_timeout())
+			command = 's';
+	    
+	    if ( command == 'o' ) {
+			LED_ON();
+			usart_puts("LED ON (PA5)\n\r");
+		}
+		else if (command == 'f' ) {    
+		    LED_OFF();
+		    usart_puts("LED OFF (PA5)\n\r");
+		}
+		else {
+			usart_puts("Waiting command...\n\r");
+		    _delay_ms(1000);
+		}
 	}
 
 	return 0;	   

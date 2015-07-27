@@ -23,6 +23,7 @@
 
 #define USART_TX 2
 #define USART_RX 3
+#define BAUDRATE 9600
 
 inline void usart_init() {
 	/* enable USART2 in APB1 */
@@ -68,11 +69,16 @@ inline void usart_init() {
 	USART2->CR1 |= USART_CR1_TE | USART_CR1_RE;
 	/* 1 bit stop */
 	USART2->CR2 &= ~(USART_CR2_STOP_0 | USART_CR2_STOP_1);
-	/* USARTDIV = 273.4375 (baud rate 9600) */
-	/* USART2->BRR |= 0x1117; */
-	/* USARTDIV = 22.8125 (baud rate 115200) */
-	/* ref manual p. 519 PCLK1=42MHZ BRR[16:4] = 0x16 = 22  BRR[3:0]=0x7 */
-	USART2->BRR |= 0x167;
+	
+	if ( BAUDRATE == 9600 ) {
+	    /* USARTDIV = 273.4375 (baud rate 9600) */
+        USART2->BRR |= 0x1117;
+	}
+	else {	
+		/* USARTDIV = 22.8125 (baud rate 115200) */
+		/* ref manual p. 519 PCLK1=42MHZ BRR[16:4] = 0x16 = 22  BRR[3:0]=0x7 */
+		USART2->BRR |= 0x167;
+	}
 
 	/* enable USART2 */
 	USART2->CR1 |= USART_CR1_UE;
